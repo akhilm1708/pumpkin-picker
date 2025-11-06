@@ -1,16 +1,14 @@
-import turtle
+import pygame
+import sys
 import os
 import random
 
-wn = turtle.Screen()
-wn.setup(width=1000, height=600)
-wn.title("Pumpkin Picker")
-wn.bgcolor("black")
-
-#Cite: https://stackoverflow.com/questions/62613041/what-does-turtle-tracer-do
-wn.tracer(0)
-
-painter = turtle.Turtle()
+# Initialize pygame and window
+pygame.init()
+WIDTH, HEIGHT = 1000, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Pumpkin Picker")
+clock = pygame.time.Clock()
 
 class Pumpkin:
     """Class to represent and draw a pumpkin."""
@@ -20,15 +18,9 @@ class Pumpkin:
         self.radius = radius
         self.color = color
 
-    def draw_stem(self):
+    def draw(self, surface):
         """Draws the pumpkin given its attributes."""
-        painter.goto(self.x, self.y)
-        painter.pendown()
-        painter.color(self.color)
-        painter.begin_fill()
-        painter.circle(self.radius)
-        painter.end_fill()
-        painter.penup()
+        pygame.draw.circle(surface, pygame.Color(self.color), (int(self.x), int(self.y)), int(self.radius))
 
 
 class Stem:
@@ -39,41 +31,62 @@ class Stem:
         self.width = width
         self.height = height
 
-    def draw(self):
+    def draw(self, surface):
         """Draws the stem given its attributes."""
-        painter.goto(self.x - self.width / 2, self.y)
-        painter.pendown()
-        painter.color("brown")
-        painter.begin_fill()
-
-        for _ in range(2):
-            painter.forward(self.width)
-            painter.left(90)
-            painter.forward(self.height)
-            painter.left(90)
-
-        painter.end_fill()
-        painter.penup()
- 
+        rect = pygame.Rect(0, 0, int(self.width), int(self.height))
+        rect.centerx = int(self.x)
+        rect.top = int(self.y)
+        pygame.draw.rect(surface, pygame.Color("brown"), rect)
 
 
 pumpkin_colors = ["orange", "darkorange"]
 
-# Draw multiple pumpkins (iteration):
-for n in range(5):
-    # Pumpkin parameters
-    x = (n - 2) * 200
-    y = 0
-    size = 50
-    color = random.choice(pumpkin_colors)
 
-    # Draw pumpkin
-    pumpkin = Pumpkin(x, y, size, color)
-    pumpkin.draw_body()
-    pumpkin.draw_stem()
+def make_scene():
+    pumpkins = []
+    stems = []
+    center_x = WIDTH // 2
+    center_y = HEIGHT // 2
 
-#Cite: https://stackoverflow.com/questions/62613041/what-does-turtle-tracer-do
-wn.update()
+    for n in range(5):
+        # Pumpkin parameters
+        x = center_x + (n - 2) * 200
+        y = center_y
+        size = 50
+        color = random.choice(pumpkin_colors)
 
-wn.mainloop()
+        # Draw pumpkin
+        stem_height = 30
+        stem_width = 15
+        # place stem above pumpkin (top y of stem)
+        stem_top = y - size - stem_height
+        stems.append(Stem(x, stem_top, stem_width, stem_height))
 
+        pumpkins.append(Pumpkin(x, y, size, color))
+
+    return pumpkins, stems
+
+pumpkins, stems = make_scene()
+
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            running = False
+
+    screen.fill(pygame.Color("black"))
+
+    # draw stems then pumpkins 
+    for stem in stems:
+        stem.draw(screen)
+    for p in pumpkins:
+        p.draw(screen)
+
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()
+sys.exit()
