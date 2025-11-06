@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import random
+import string
 
 # Initialize pygame and window
 pygame.init()
@@ -9,6 +10,11 @@ WIDTH, HEIGHT = 1000, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pumpkin Picker")
 clock = pygame.time.Clock()
+
+#Adds a background with image "background.jpg"
+background_image = pygame.image.load(os.path.join("background.jpg"))
+background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+
 
 class Pumpkin:
     """Class to represent and draw a pumpkin."""
@@ -21,6 +27,13 @@ class Pumpkin:
     def draw(self, surface):
         """Draws the pumpkin given its attributes."""
         pygame.draw.circle(surface, pygame.Color(self.color), (int(self.x), int(self.y)), int(self.radius))
+    
+    def add_letter(self, letter):
+        """Adds a letter on the pumpkin."""
+        font = pygame.font.SysFont(None, int(self.radius))
+        text = font.render(letter, True, pygame.Color("black"))
+        text_rect = text.get_rect(center=(int(self.x), int(self.y)))
+        screen.blit(text, text_rect)
 
 
 class Stem:
@@ -41,8 +54,12 @@ class Stem:
 
 pumpkin_colors = ["orange", "darkorange"]
 
+#Cite: https://stackoverflow.com/questions/16060899/alphabet-range-in-python
+pumpkin_letters = list(string.ascii_uppercase)
+
 
 def make_scene():
+    """Creates pumpkins and stems for the scene."""
     pumpkins = []
     stems = []
     center_x = WIDTH // 2
@@ -77,13 +94,18 @@ while running:
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
 
-    screen.fill(pygame.Color("black"))
+    #keeps the background image
+    screen.blit(background_image, (0, 0))
+
 
     # draw stems then pumpkins 
     for stem in stems:
         stem.draw(screen)
     for p in pumpkins:
         p.draw(screen)
+        Letter = random.choice(pumpkin_letters)
+        p.add_letter(Letter)
+
 
     pygame.display.flip()
     clock.tick(60)
