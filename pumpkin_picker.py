@@ -1,13 +1,8 @@
-<<<<<<< Updated upstream
 import pygame
-import sys
-import os
-=======
-import turtle
-# import os
->>>>>>> Stashed changes
 import random
 import string
+import sys
+import os
 
 # Initialize pygame and window
 pygame.init()
@@ -20,6 +15,10 @@ clock = pygame.time.Clock()
 background_image = pygame.image.load(os.path.join("background.jpg"))
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
+pumpkin_colors = ["orange", "darkorange"]
+#Cite: https://stackoverflow.com/questions/16060899/alphabet-range-in-python
+pumpkin_letters = list(string.ascii_uppercase)
+
 
 class Pumpkin:
     """Class to represent and draw a pumpkin."""
@@ -28,15 +27,16 @@ class Pumpkin:
         self.y = y
         self.radius = radius
         self.color = color
+        self.letter = random.choice(pumpkin_letters)
 
     def draw(self, surface):
         """Draws the pumpkin given its attributes."""
         pygame.draw.circle(surface, pygame.Color(self.color), (int(self.x), int(self.y)), int(self.radius))
     
-    def add_letter(self, letter):
-        """Adds a letter on the pumpkin."""
+    def add_letter(self):
+        """Draw the pumpkin's stored letter on the pumpkin."""
         font = pygame.font.SysFont(None, int(self.radius))
-        text = font.render(letter, True, pygame.Color("black"))
+        text = font.render(self.letter, True, pygame.Color("black"))
         text_rect = text.get_rect(center=(int(self.x), int(self.y)))
         screen.blit(text, text_rect)
 
@@ -57,21 +57,7 @@ class Stem:
         pygame.draw.rect(surface, pygame.Color("brown"), rect)
 
 
-pumpkin_colors = ["orange", "darkorange"]
-
-#Cite: https://stackoverflow.com/questions/16060899/alphabet-range-in-python
-pumpkin_letters = list(string.ascii_uppercase)
-
-<<<<<<< Updated upstream
-=======
-    # Draw pumpkin
-    pumpkin_body = Pumpkin(x, y, size, color)
-    pumpkin_body.draw()
-
-    pumpkin_stem = Stem(x, y + size, size * 0.28, size * 0.36)
-    pumpkin_stem.draw()
->>>>>>> Stashed changes
-
+ 
 def make_scene():
     """Creates pumpkins and stems for the scene."""
     pumpkins = []
@@ -80,19 +66,20 @@ def make_scene():
     center_y = HEIGHT // 2
 
     for n in range(5):
-        # Pumpkin parameters
+        # Pumpkin parameters (dimensions, position, color, etc.)
         x = center_x + (n - 2) * 200
         y = center_y
-        size = 50
+        size = random.randint(40, 60)
         color = random.choice(pumpkin_colors)
 
-        # Draw pumpkin
+        #Stem parameters
         stem_height = 30
         stem_width = 15
         # place stem above pumpkin (top y of stem)
         stem_top = y - size - stem_height
-        stems.append(Stem(x, stem_top, stem_width, stem_height))
 
+        #Add each stem and pumpkin to their respective lists for drawing later
+        stems.append(Stem(x, stem_top, stem_width, stem_height))
         pumpkins.append(Pumpkin(x, y, size, color))
 
     return pumpkins, stems
@@ -107,6 +94,8 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
+        
+    
 
     #keeps the background image
     screen.blit(background_image, (0, 0))
@@ -117,8 +106,8 @@ while running:
         stem.draw(screen)
     for p in pumpkins:
         p.draw(screen)
-        Letter = random.choice(pumpkin_letters)
-        p.add_letter(Letter)
+        # draw the already-chosen letter for each pumpkin (remains same)
+        p.add_letter()
 
 
     pygame.display.flip()
