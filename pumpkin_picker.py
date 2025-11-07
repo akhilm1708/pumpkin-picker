@@ -1,6 +1,11 @@
+<<<<<<< Updated upstream
 import pygame
 import sys
 import os
+=======
+import turtle
+# import os
+>>>>>>> Stashed changes
 import random
 import string
 
@@ -57,6 +62,15 @@ pumpkin_colors = ["orange", "darkorange"]
 #Cite: https://stackoverflow.com/questions/16060899/alphabet-range-in-python
 pumpkin_letters = list(string.ascii_uppercase)
 
+<<<<<<< Updated upstream
+=======
+    # Draw pumpkin
+    pumpkin_body = Pumpkin(x, y, size, color)
+    pumpkin_body.draw()
+
+    pumpkin_stem = Stem(x, y + size, size * 0.28, size * 0.36)
+    pumpkin_stem.draw()
+>>>>>>> Stashed changes
 
 def make_scene():
     """Creates pumpkins and stems for the scene."""
