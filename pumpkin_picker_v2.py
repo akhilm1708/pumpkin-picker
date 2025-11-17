@@ -19,6 +19,7 @@ background_image = pygame.image.load(os.path.join("background.jpg"))
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
 pumpkin_colors = ["orange", "darkorange"]
+pumpkin_letters = list(string.ascii_uppercase)
 
 class Pumpkin:
     """Class to represent and draw a pumpkin."""
@@ -28,7 +29,7 @@ class Pumpkin:
         self.radius = radius
         self.color = color
         #Cite: https://stackoverflow.com/questions/16060899/alphabet-range-in-python
-        self.letter = random.choice(list(string.ascii_uppercase))
+        self.letter = random.choice(pumpkin_letters)
         #
         self.is_falling = False
         self.fall_speed = 5
@@ -44,11 +45,13 @@ class Pumpkin:
         text = font.render(self.letter, True, pygame.Color("black"))
         text_rect = text.get_rect(center=(int(self.x), int(self.y)))
         screen.blit(text, text_rect)
+        # pumpkin_letters.remove(self.letter)
     
     def update(self):
         """Updates the pumpkin's position if it is falling."""
         if self.is_falling:
             self.y += self.fall_speed
+            # pumpkin_letters.append(self.letter)
 
 
 class Stem:
@@ -58,6 +61,8 @@ class Stem:
         self.y = y
         self.width = width
         self.height = height
+        self.is_falling = False
+        self.fall_speed = 5
 
     def draw(self, surface):
         """Draws the stem given its attributes."""
@@ -65,6 +70,11 @@ class Stem:
         rect.centerx = int(self.x)
         rect.top = int(self.y)
         pygame.draw.rect(surface, pygame.Color("brown"), rect)
+    
+    def update(self):
+        """Updates the stem's position if it is falling."""
+        if self.is_falling:
+            self.y += self.fall_speed
 
 
  
@@ -110,11 +120,12 @@ while running:
                 if p.letter == pressed_char and not p.is_falling:
                     p.is_falling = True
                     stems[i].is_falling = True
-                    del pumpkins[i]
-                    del stems[i]
                     break
         
-    
+    for p in pumpkins:
+        p.update()
+    for stem in stems:
+        stem.update()
 
     #keeps the background image
     screen.blit(background_image, (0, 0))
