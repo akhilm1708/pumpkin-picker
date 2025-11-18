@@ -1,4 +1,5 @@
-# Version 1.
+# Version 1.0: The start of sprint 1
+
 
 # Later reverted to pygame for better control over graphics and event handling.
 
