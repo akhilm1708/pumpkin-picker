@@ -19,8 +19,13 @@ background_image = pygame.image.load(os.path.join("background.jpg"))
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
 pumpkin_colors = ["orange", "darkorange"]
+
+#Cite: https://stackoverflow.com/questions/16060899/alphabet-range-in-python
 new_pumpkin_letters = list(string.ascii_uppercase)
+#
+
 used_pumpkin_letters = []
+score = 0   
 
 class Pumpkin:
     """Class to represent and draw a pumpkin."""
@@ -29,11 +34,20 @@ class Pumpkin:
         self.y = y
         self.radius = radius
         self.color = color
-        #Cite: https://stackoverflow.com/questions/16060899/alphabet-range-in-python
+
+        if not new_pumpkin_letters:
+            new_pumpkin_letters.extend(used_pumpkin_letters)
+            used_pumpkin_letters.clear()
         self.letter = random.choice(new_pumpkin_letters)
-        #
+
+        try:
+            new_pumpkin_letters.remove(self.letter)
+            used_pumpkin_letters.append(self.letter)
+        except ValueError:
+            pass
+            
         self.is_falling = False
-        self.fall_speed = 5
+        self.fall_speed = 10
 
 
     def draw(self, surface):
@@ -46,9 +60,6 @@ class Pumpkin:
         text = font.render(self.letter, True, pygame.Color("black"))
         text_rect = text.get_rect(center=(int(self.x), int(self.y)))
         screen.blit(text, text_rect)
-        # pumpkin_letters.remove(self.letter)
-        new_pumpkin_letters.remove(self.letter)
-        used_pumpkin_letters.append(self.letter)
     
     def update(self):
         """Updates the pumpkin's position if it is falling."""
@@ -58,6 +69,8 @@ class Pumpkin:
         if new_pumpkin_letters == []:
             new_pumpkin_letters.extend(used_pumpkin_letters)
             used_pumpkin_letters.clear()
+    
+    # def assign_new_letter(self):
 
 
 
@@ -69,7 +82,7 @@ class Stem:
         self.width = width
         self.height = height
         self.is_falling = False
-        self.fall_speed = 5
+        self.fall_speed = 10
 
     def draw(self, surface):
         """Draws the stem given its attributes."""
@@ -130,14 +143,6 @@ while running:
                     break
 
 
-    #draw stems and pumpkins
-    for stem in stems:
-        stem.draw(screen)
-    for p in pumpkins:
-        p.draw(screen)
-        # draw the already-chosen letter for each pumpkin (remains same)
-        p.add_letter()
-
 
 
     # Update positions of falling pumpkins and stems
@@ -150,12 +155,37 @@ while running:
     #keeps the background image
     screen.blit(background_image, (0, 0))
 
+    
+    #draw stems and pumpkins
+    for stem in stems:
+        stem.draw(screen)
+    for p in pumpkins:
+        p.draw(screen)
+        # draw the already-chosen letter for each pumpkin (remains same)
+        p.add_letter()
 
 
+    
+    new_pumpkins = []
+    new_stems = []
+    
     #Cite: https://www.google.com/search?aep=48&cud=0&ie=UTF-8&q=can+you+show+me+an+example+solution+of+how+to+make+five+pumpkins+appear+on+the+screen%2C+and+making+them+able+to+fall+when+the+corresponding+letter+is+clicked%2C+referencing+the+list+of+pumpkins%3A&qsubts=1763053330009&safe=active&sourceid=chrome&udm=50&mtid=aQ8WaePtHIz40PEPl8Oo6Q4&mstk=AUtExfCZfKv8Moiqmz3M8oCFB4xTC6aKNbwBJbVhnsTlwTcn5nyXzR7eKqVFOnegLbJ0PbrOytmkO56MSFBZmJR4uW9pWFqlW4-87j0q-ADUHPH_jcpw3bJfRfFzTAsBqlqU0aHKApM1Ks0hfWm9hM8JwG-goT57YyT_HNg&csuir=1&sei=rRAWafrHK-fC0PEPq-rxCQ
-    pumpkins = [p for p in pumpkins if p.y - p.radius < HEIGHT]
-    stems = [s for s in stems if s.y < HEIGHT]
-    #
+    # NEW CODE (THE FIX)
+    for i in range(len(pumpkins)):
+        pumpkin = pumpkins[i]
+        stem = stems[i]
+        
+        if pumpkin.y - pumpkin.radius < HEIGHT:
+            new_pumpkins.append(pumpkin)
+            new_stems.append(stem)
+    #----------------------------------------
+        else:
+            score += 1
+            print(f"Score: {score}") 
+
+    pumpkins = new_pumpkins
+    stems = new_stems
+
 
     pygame.display.flip()
     clock.tick(60)
