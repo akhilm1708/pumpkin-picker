@@ -237,37 +237,43 @@ while running:
     
     #Cite: https://www.google.com/search?aep=48&cud=0&ie=UTF-8&q=can+you+show+me+an+example+solution+of+how+to+make+five+pumpkins+appear+on+the+screen%2C+and+making+them+able+to+fall+when+the+corresponding+letter+is+clicked%2C+referencing+the+list+of+pumpkins%3A&qsubts=1763053330009&safe=active&sourceid=chrome&udm=50&mtid=aQ8WaePtHIz40PEPl8Oo6Q4&mstk=AUtExfCZfKv8Moiqmz3M8oCFB4xTC6aKNbwBJbVhnsTlwTcn5nyXzR7eKqVFOnegLbJ0PbrOytmkO56MSFBZmJR4uW9pWFqlW4-87j0q-ADUHPH_jcpw3bJfRfFzTAsBqlqU0aHKApM1Ks0hfWm9hM8JwG-goT57YyT_HNg&csuir=1&sei=rRAWafrHK-fC0PEPq-rxCQ
     # NEW CODE (THE FIX)
+
+    #Iteration: loop over every pumpkin index to process each pumpkin/stem pair.
     for i in range(len(pumpkins)):
+        #Sequencing: assign local references for clarity (these two lines run one after the other).
         pumpkin = pumpkins[i]
         stem = stems[i]
 
-        # If pumpkin hasn't fallen past the visible bottom (with margin), keep it
+        #Selection: check whether pumpkin is still above the respawn threshold.
         if pumpkin.y - pumpkin.radius < HEIGHT - RESPAWN_MARGIN:
+            #Sequencing: if the pumpkin hasn't fallen past the threshold, keep it in the new lists.
             new_pumpkins.append(pumpkin)
             new_stems.append(stem)
     #######################################
 
         else:
-            # Pumpkin has fallen past the threshold. Count it and spawn a fresh one
-            # Only award a point if this pumpkin was marked to award on fall
+            #Selection: this branch runs when the pumpkin has fallen past the bottom threshold.
+            #Sequencing: if the pumpkin was marked to award points on fall, increment score first.
             if getattr(pumpkin, 'award_on_fall', False):
                 score += 1
                 print(f"Score: {score}")
 
-            # Spawn a new pumpkin in the same column (same x) and reset it near the center
+            #Sequencing: prepare spawn parameters for a fresh pumpkin in the same column.
             spawn_x = pumpkin.x
             spawn_y = HEIGHT // 2
             size = random.randint(40, 60)
             color = random.choice(pumpkin_colors)
 
-            # Create matching stem positioned above the new pumpkin
+            #Sequencing: compute stem geometry based on the new pumpkin size/position.
             stem_height = 30
             stem_width = 15
             stem_top = spawn_y - size - stem_height
 
+            #Sequencing: create new pumpkin and matching stem objects.
             new_p = Pumpkin(spawn_x, spawn_y, size, color)
             new_s = Stem(spawn_x, stem_top, stem_width, stem_height)
 
+            #Sequencing: append the freshly created objects to the lists so they will be drawn/updated next frame.
             new_pumpkins.append(new_p)
             new_stems.append(new_s)
 
